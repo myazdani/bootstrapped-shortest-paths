@@ -72,5 +72,29 @@ def get_median_and_sampled_paths(G, weights, num_samples = 10):
     
     return median_path, sample_paths
 
+
+def get_all_median_and_sampled_paths(G, weights, num_samples = 10):
+    median_edge_weights = {}
+    sampled_edge_weights = {}
+    for edge in G.edges:
+        sampled_edge_weights[edge] = []
+        for _ in range(num_samples):
+            sampled_edge_weights[edge].append(random.choice(weights))
+        median_edge_weights[edge] = np.median(sampled_edge_weights[edge])
+    
+    nx.set_edge_attributes(G, median_edge_weights, "median_weights") 
+    all_median_path = nx.shortest_path(G, weight="median_weights")
+    
+    all_sample_paths = []
+    for i in range(num_samples):
+        edge_weight_sample = {edge: sampled_edge_weights[edge][i] 
+                                for edge in sampled_edge_weights.keys()}
+
+        nx.set_edge_attributes(G, edge_weight_sample, "edge_weight_sample") 
+        sample_path = nx.shortest_path(G, weight="edge_weight_sample")
+        all_sample_paths.append(sample_path)
+    
+    return all_median_path, all_sample_paths
+
         
 
